@@ -636,6 +636,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         await sleep(3000);
 
+        updateLoadingMessage('Syncing Branches', 'Ensuring your fork has the latest upstream commits…');
+        const syncRes = await fetch(`${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/merge-upstream`, {
+            method: 'POST',
+            headers: { ...buildHeaders(), 'Content-Type': 'application/json' },
+            body: JSON.stringify({ branch: 'main' })
+        });
+        if (!syncRes.ok && syncRes.status !== 409 && syncRes.status !== 422) {
+            console.warn('Warning syncing fork:', await syncRes.text());
+        }
+
         updateLoadingMessage('Creating Work Branch', 'Creating a clean branch based on latest upstream…');
         
         // Fetch the SHA of the UPSTREAM main branch, not the fork's main, to avoid old dirty history
