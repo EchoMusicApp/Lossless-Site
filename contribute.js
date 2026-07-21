@@ -636,46 +636,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
         await sleep(3000);
 
-        updateLoadingMessage('Syncing Branches', 'Ensuring your fork is up-to-date with upstream main…');
-        const syncRes = await fetch(`${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/merge-upstream`, {
-            method: 'POST',
-            headers: { ...buildHeaders(), 'Content-Type': 'application/json' },
-            body: JSON.stringify({ branch: 'main' })
-        });
-        if (!syncRes.ok && syncRes.status !== 409 && syncRes.status !== 422) {
-            console.warn('Warning syncing fork:', await syncRes.text());
-        }
-
-        updateLoadingMessage('Creating Work Branch', 'Creating a separate branch for your track…');
+        updateLoadingMessage('Creating Work Branch', 'Creating a clean branch based on latest upstream…');
         
-        let refRes;
-        let refData;
-        let mainSha;
+        // Fetch the SHA of the UPSTREAM main branch, not the fork's main, to avoid old dirty history
+        const upstreamRefRes = await fetch(`${GITHUB_API_URL}/repos/${TARGET_OWNER}/${TARGET_REPO}/git/ref/heads/main`, {
+            headers: buildHeaders()
+        });
+        if (!upstreamRefRes.ok) {
+            throw new Error('Failed to get the latest commit SHA from the upstream repository.');
+        }
+        const upstreamRefData = await upstreamRefRes.json();
+        const upstreamSha = upstreamRefData.object.sha;
+
+        let branchRes;
         for (let i = 0; i < 15; i++) {
-            refRes = await fetch(`${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/git/ref/heads/main`, {
-                headers: buildHeaders()
+            branchRes = await fetch(`${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/git/refs`, {
+                method: 'POST',
+                headers: { ...buildHeaders(), 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ref: `refs/heads/${branchName}`, sha: upstreamSha })
             });
-            if (refRes.ok) {
-                refData = await refRes.json();
-                mainSha = refData.object.sha;
+            
+            if (branchRes.ok) {
                 break;
             }
-            await sleep(3000); // Retry every 3 seconds while fork is finalizing
+            
+            const txt = await branchRes.clone().text();
+            if (txt.includes('already exists')) {
+                // If the branch already exists, we should update it to point to the latest upstream SHA
+                await fetch(`${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/git/refs/heads/${branchName}`, {
+                    method: 'PATCH',
+                    headers: { ...buildHeaders(), 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sha: upstreamSha, force: true })
+                });
+                break;
+            }
+
+            // If it failed because the fork isn't fully ready yet, wait and retry
+            await sleep(3000);
         }
 
-        if (!mainSha) {
-            const errText = refRes ? await refRes.text() : 'No response';
-            throw new Error(`Failed to get the latest commit SHA of main after multiple retries. GitHub may still be creating your fork. Try again in a minute. (Error: ${errText})`);
-        }
-
-        const branchRes = await fetch(`${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/git/refs`, {
-            method: 'POST',
-            headers: { ...buildHeaders(), 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ref: `refs/heads/${branchName}`, sha: mainSha })
-        });
-        if (!branchRes.ok) {
-            const txt = await branchRes.text();
-            if (!txt.includes('already exists')) throw new Error('Failed to create branch: ' + txt);
+        if (!branchRes || (!branchRes.ok && !(await branchRes.clone().text()).includes('already exists'))) {
+            const errText = branchRes ? await branchRes.text() : 'No response';
+            throw new Error(`Failed to create the work branch on your fork after multiple retries. GitHub may still be provisioning your fork. Please try again. (Error: ${errText})`);
         }
 
         return forkOwner;
