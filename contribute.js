@@ -647,13 +647,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         updateLoadingMessage('Creating Work Branch', 'Creating a separate branch for your track…');
-        const refRes = await fetch(`${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/git/ref/heads/main`, {
-            headers: buildHeaders()
-        });
-        if (!refRes.ok) throw new Error('Failed to get the latest commit SHA of main.');
+        
+        let refRes;
+        let refData;
+        let mainSha;
+        for (let i = 0; i < 15; i++) {
+            refRes = await fetch(`${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/git/ref/heads/main`, {
+                headers: buildHeaders()
+            });
+            if (refRes.ok) {
+                refData = await refRes.json();
+                mainSha = refData.object.sha;
+                break;
+            }
+            await sleep(3000); // Retry every 3 seconds while fork is finalizing
+        }
 
-        const refData  = await refRes.json();
-        const mainSha  = refData.object.sha;
+        if (!mainSha) {
+            const errText = refRes ? await refRes.text() : 'No response';
+            throw new Error(`Failed to get the latest commit SHA of main after multiple retries. GitHub may still be creating your fork. Try again in a minute. (Error: ${errText})`);
+        }
 
         const branchRes = await fetch(`${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/git/refs`, {
             method: 'POST',
