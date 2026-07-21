@@ -215,28 +215,7 @@
             return null;
         }
 
-        const albumArtCache = {};
 
-        async function fetchAlbumArt(song, artist, imgId) {
-            const query = `${song} ${artist}`;
-            if (albumArtCache[query]) {
-                const img = document.getElementById(imgId);
-                if (img) img.src = albumArtCache[query];
-                return;
-            }
-            try {
-                const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&limit=1&entity=song`);
-                const data = await res.json();
-                if (data.results && data.results.length > 0) {
-                    const artUrl = data.results[0].artworkUrl100.replace('100x100bb', '300x300bb');
-                    albumArtCache[query] = artUrl;
-                    const img = document.getElementById(imgId);
-                    if (img) img.src = artUrl;
-                }
-            } catch(e) {
-                console.warn('Failed to fetch album art for', query);
-            }
-        }
 
         function createPRCard(pr, songs, audioUrl) {
             const card = document.createElement('div');
@@ -258,21 +237,12 @@
             const remainingCount = songs.length > 5 ? `<span class="pending-more">+${songs.length - 5} more songs</span>` : '';
 
             const audioId = 'pending_aud_' + Math.random().toString(36).substr(2, 9);
-            const imgId = 'img_' + audioId;
 
             card.innerHTML = `
                 <div class="pending-card-layout">
                     <div class="pending-audio-col">
                         ${audioUrl ? `
-                            <div class="pending-audio-wrapper" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #111, #222); position: relative; overflow: hidden;">
-                                <img id="${imgId}" style="position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0.5; z-index: 0; transition: opacity 0.3s;" />
-                                <div class="audio-waves" style="z-index: 1;">
-                                    <div class="wave-bar"></div>
-                                    <div class="wave-bar"></div>
-                                    <div class="wave-bar"></div>
-                                    <div class="wave-bar"></div>
-                                    <div class="wave-bar"></div>
-                                </div>
+                            <div class="pending-audio-wrapper" style="display: flex; align-items: center; justify-content: center; background: #111; position: relative; overflow: hidden;">
                                 <audio id="${audioId}" src="${audioUrl}" style="display: none;"></audio>
                                 <button class="custom-play-btn" onclick="togglePlay(event, '${audioId}', this)" style="position: relative; z-index: 2;">
                                     <i class="fas fa-play" style="margin-left: 4px;"></i>
@@ -310,9 +280,7 @@
                 </div>
             `;
 
-            if (songs.length > 0) {
-                fetchAlbumArt(songs[0].song, songs[0].artist, imgId);
-            }
+
 
             return card;
         }
@@ -367,7 +335,7 @@
         })();
     </script>
     <script>
-        function togglePlay(event, audioId, btn) {
+        async function togglePlay(event, audioId, btn) {
             event.preventDefault();
             event.stopPropagation();
             const audio = document.getElementById(audioId);
@@ -382,9 +350,18 @@
                     i.style.marginLeft = '4px';
                 });
                 
-                audio.play();
-                icon.className = 'fas fa-pause';
+                icon.className = 'fas fa-circle-notch fa-spin';
                 icon.style.marginLeft = '0';
+                
+                try {
+                    await audio.play();
+                    icon.className = 'fas fa-pause';
+                    icon.style.marginLeft = '0';
+                } catch (e) {
+                    console.error("Playback failed", e);
+                    icon.className = 'fas fa-play';
+                    icon.style.marginLeft = '4px';
+                }
             } else {
                 audio.pause();
                 icon.className = 'fas fa-play';

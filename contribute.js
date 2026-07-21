@@ -584,10 +584,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const primaryEntry = entries[0]; 
         const sanitizedOriginalName = selectedFile.name.toLowerCase().replace(/[^a-z0-9._-]/g, '_');
         const cleanName    = sanitizedOriginalName.split('.')[0];
-        const newFilename  = `${gitHubUsername.toLowerCase()}-${sanitizedOriginalName}`;
+        const newFilename  = `${gitHubUsername.toLowerCase()}-${Date.now()}-${sanitizedOriginalName}`;
         const targetPath   = `Music/${newFilename}`;
         const trackUrl    = `https://lossless.echomusic.fun/${targetPath}`;
-        const branchName   = `lossless-${gitHubUsername.toLowerCase()}-${cleanName}`;
+        const branchName   = `lossless-${gitHubUsername.toLowerCase()}-${cleanName}-${Date.now()}`;
 
         const forkOwner = await forkAndSync(branchName, primaryEntry.song);
 
@@ -603,7 +603,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 branch: branchName
             })
         });
-        if (!uploadRes.ok) throw new Error('Failed to upload the lossless file to your fork.');
+        if (!uploadRes.ok) {
+            const errBody = await uploadRes.text();
+            throw new Error(`Failed to upload the lossless file to your fork. ${errBody}`);
+        }
 
         await updateTrackJson(forkOwner, branchName, entries, trackUrl);
         const prUrl = await openPullRequest(forkOwner, branchName, entries, destDir, targetPath);
