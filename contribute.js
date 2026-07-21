@@ -669,41 +669,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function updateTrackJson(forkOwner, branchName, entries, trackAudioUrl) {
-        updateLoadingMessage('Updating Database', `Adding ${entries.length} song entr${entries.length === 1 ? 'y' : 'ies'} to music.json…`);
-
-        const trackApiUrl = `${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/contents/music.json?ref=${branchName}`;
-        const trackRes = await fetch(trackApiUrl, { headers: buildHeaders() });
-        if (!trackRes.ok) throw new Error('Failed to download music.json from your fork.');
-
-        const trackData    = await trackRes.json();
-        const trackSha     = trackData.sha;
-        const trackContent = decodeBase64Utf8(trackData.content);
-        const trackObj     = JSON.parse(trackContent);
-
-        if (!trackObj.items || !Array.isArray(trackObj.items)) {
-            throw new Error('music.json items database is missing or corrupt.');
-        }
+        updateLoadingMessage('Updating Database', `Generating submission file for ${entries.length} song entr${entries.length === 1 ? 'y' : 'ies'}…`);
 
         const newEntries = entries.map(entry => ({
             song:   entry.song,
             artist: entry.artist,
             url:    trackAudioUrl
         }));
-        trackObj.items.unshift(...newEntries);
 
-        const updatedContent = encodeBase64Utf8(JSON.stringify(trackObj, null, 2) + '\n');
+        const submissionFilename = `submissions/${gitHubUsername.toLowerCase()}-${Date.now()}.json`;
+        const fileContent = encodeBase64Utf8(JSON.stringify(newEntries, null, 2) + '\n');
 
-        const updateRes = await fetch(`${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/contents/music.json`, {
+        const updateRes = await fetch(`${GITHUB_API_URL}/repos/${forkOwner}/${TARGET_REPO}/contents/${submissionFilename}`, {
             method: 'PUT',
             headers: { ...buildHeaders(), 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                message: `feat: update music.json — add ${entries.length} song(s)`,
-                content: updatedContent,
-                sha:     trackSha,
+                message: `feat: add submission file for ${entries.length} song(s)`,
+                content: fileContent,
                 branch:  branchName
             })
         });
-        if (!updateRes.ok) throw new Error('Failed to write updated music.json to your fork.');
+        if (!updateRes.ok) {
+            const txt = await updateRes.text();
+            throw new Error('Failed to write submission file to your fork: ' + txt);
+        }
     }
 
     async function openPullRequest(forkOwner, branchName, entries, destDir, trackPath) {
