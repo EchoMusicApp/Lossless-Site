@@ -530,25 +530,7 @@ header p {
     opacity: 1;
 }
 
-.audio-preview::after {
-    content: '\f028';
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 900;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.9);
-    font-size: 2.2rem;
-    color: rgba(255, 255, 255, 0.9);
-    opacity: 0;
-    transition: var(--transition);
-    pointer-events: none;
-}
 
-.track-card:hover .audio-preview::after {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-}
 
 .card-info {
     flex: 1;
@@ -2472,24 +2454,19 @@ footer a:hover {
 .custom-play-btn {
     width: 64px;
     height: 64px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: transparent;
+    border: none;
     color: #ffffff;
-    font-size: 1.5rem;
+    font-size: 2.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
 }
 
 .custom-play-btn:hover {
-    background: rgba(255, 255, 255, 0.25);
-    transform: scale(1.1);
-    border-color: rgba(255, 255, 255, 0.4);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    transform: scale(1.15);
+    opacity: 0.8;
 }
