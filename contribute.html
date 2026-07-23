@@ -1,181 +1,297 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="robots" content="noindex, nofollow">
-    <meta name="theme-color" content="#121212">
-    <title>Submit Lossless Track - Echo Music Lossless Hub</title>
-    <link class="brand-favicon" rel="icon" type="image/png" href="App Logo/echo.png">
-    <link rel="stylesheet" href="styles.css?v=4">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <title>Submit Track - Echo Music Lossless Hub</title>
+    <link rel="icon" type="image/png" href="App Logo/echo.png">
+    <link rel="stylesheet" href="styles.css?v=5">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-
 <body>
-    <nav class="top-bar">
-        <div class="top-bar-content">
-            <a href="index.html" class="brand">
-                <img src="App Logo/echo.png" alt="Echo Music Logo" class="app-icon">
-                <span class="copyright">ECHO MUSIC</span>
-            </a>
-            <div class="nav-links">
-                <a href="index.html" class="nav-link"><i class="fas fa-arrow-left"></i> Gallery</a>
-            </div>
-        </div>
-    </nav>
-
-    <main class="container contribute-container">
-
-        <section id="login-section" class="auth-clean-section" style="display: none; text-align: center; max-width: 480px; margin: 4rem auto 0 auto;">
-            <h3 class="auth-title">Connect to GitHub</h3>
-            <p class="auth-desc">To submit a lossless track, please authenticate with your GitHub account. This allows the portal to open a Pull Request on your behalf, crediting you directly for your contribution.</p>
-            <button id="login-btn" class="btn btn-primary btn-auth-login">
-                <i class="fab fa-github"></i> Log in with GitHub
-            </button>
-
-        </section>
-
-        <section id="form-section" class="form-card" style="display: none; max-width: 700px; margin: 0 auto;">
-            <div id="user-profile" class="user-profile-bar">
-                <div class="user-info">
-                    <img id="user-avatar" src="" alt="Avatar" class="avatar-img">
-                    <div>
-                        <span class="signed-in-as">Logged in as</span>
-                        <strong id="user-name" class="username-text"></strong>
-                    </div>
-                </div>
-                <button id="logout-btn" class="btn-text-only" title="Sign Out">
-                    <i class="fas fa-sign-out-alt"></i> Sign Out
+    <div class="app-container">
+        <!-- Desktop Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="sidebar-logo-container">
+                    <img src="App Logo/echo.png" alt="Logo" class="sidebar-logo">
+                    <span class="sidebar-title">Echo Music</span>
+                </a>
+                <button class="sidebar-toggle-btn" id="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
                 </button>
             </div>
+            
+            <div class="sidebar-nav-group">
+                <div class="sidebar-nav-title">Apple Music</div>
+                <a href="index.html" class="sidebar-nav-link"><i class="fas fa-play-circle"></i> Browse</a>
+                <a href="contribute.html" class="sidebar-nav-link active"><i class="fas fa-plus-circle"></i> Submit Track</a>
+                <a href="pending.html" class="sidebar-nav-link"><i class="fas fa-code-pull-request"></i> Pending PRs</a>
+            </div>
 
-            <form id="contrib-form" onsubmit="return false;">
+            <div class="sidebar-nav-group">
+                <div class="sidebar-nav-title">Resources</div>
+                <a href="developer.html" class="sidebar-nav-link"><i class="fas fa-code"></i> Developer</a>
+                <a href="https://support.iad1tya.cyou" target="_blank" rel="noopener" class="sidebar-nav-link"><i class="fas fa-hand-holding-heart"></i> Support</a>
+                <a href="https://github.com/EchoMusicApp/Lossless" target="_blank" rel="noopener" class="sidebar-nav-link"><i class="fab fa-github"></i> GitHub</a>
+            </div>
+        </aside>
 
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Mobile Header -->
+            <div class="mobile-header">
+                <div class="mobile-logo-row">
+                    <div class="mobile-logo">
+                        <img src="App Logo/echo.png" alt="Logo">
+                        Submit
+                    </div>
+                </div>
+            </div>
 
+            <div class="top-nav" style="justify-content: flex-end;">
+                <!-- Just empty space or user profile could go here later -->
+            </div>
 
-                <div id="upload-panel">
-                    <div class="form-group">
-                        <label class="form-label">Lossless Audio File</label>
-                        <div id="drop-zone" class="drag-drop-box">
-                            <input type="file" id="file-input" accept="audio/flac,.flac" style="display: none;">
-                            <i class="fas fa-cloud-upload-alt drop-icon"></i>
-                            <h4 class="drop-text">Drag &amp; drop audio here, or <span class="browse-link">browse files</span></h4>
-                            <p class="drop-subtext">Supports .flac only &mdash; Max 99 MB</p>
-                        </div>
+            <div class="content-area">
+                <h1 class="page-title">Submit Track</h1>
+                <p class="page-subtitle">Upload a lossless audio file and link it to songs.</p>
 
-                        <div id="file-info-banner" class="file-details-banner" style="display: none;">
-                            <div class="file-meta">
-                                <i class="fas fa-file-audio file-icon"></i>
-                                <div>
-                                    <strong id="selected-file-name" class="file-name-text">audio.flac</strong>
-                                    <span id="selected-file-size" class="file-size-text">0.00 MB</span>
+                <div class="form-container">
+                    <!-- Login Section -->
+                    <section id="login-section" style="display: none; text-align: center; padding: 4rem 1rem;">
+                        <h2 class="section-title" style="justify-content: center; border-bottom: none; font-size: 1.5rem;">Connect to GitHub</h2>
+                        <p class="form-desc" style="margin-bottom: 2rem;">To submit a lossless track, please authenticate with your GitHub account. This allows the portal to open a Pull Request on your behalf.</p>
+                        <button id="login-btn" class="btn btn-primary" style="font-size: 1rem; padding: 0.8rem 2rem;">
+                            <i class="fab fa-github"></i> Log in with GitHub
+                        </button>
+                    </section>
+
+                    <!-- Form Section -->
+                    <section id="form-section" style="display: none;">
+                        <div id="user-profile" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; padding: 1rem; background: var(--input-bg); border-radius: 8px;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <img id="user-avatar" src="" alt="Avatar" style="width: 40px; height: 40px; border-radius: 50%;">
+                                <div style="display: flex; flex-direction: column;">
+                                    <span style="font-size: 0.75rem; color: var(--text-secondary);">Logged in as</span>
+                                    <strong id="user-name" style="font-size: 0.95rem; color: var(--text-main);"></strong>
                                 </div>
                             </div>
-                            <button type="button" id="remove-file-btn" class="btn-remove-file" title="Remove File">
-                                <i class="fas fa-times"></i>
+                            <button id="logout-btn" class="btn btn-secondary" title="Sign Out" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+                                <i class="fas fa-sign-out-alt"></i> Sign Out
                             </button>
                         </div>
-                    </div>
 
-                    <div class="validation-container">
-                        <h4 class="validation-title">Technical Requirements Validation</h4>
-                        <div class="validation-list">
-                            <div class="validation-item" id="check-format">
-                                <i class="fas fa-circle-notch fa-spin check-status"></i>
-                                <span>File format must be <code>.flac</code></span>
-                            </div>
-                            <div class="validation-item" id="check-size">
-                                <i class="fas fa-circle-notch fa-spin check-status"></i>
-                                <span>File size must be equal to or less than <strong>99 MB</strong></span>
-                            </div>
-                            <div class="validation-item" id="check-duration">
-                                <i class="fas fa-circle-notch fa-spin check-status"></i>
-                                <span>File must contain valid fLaC signature</span>
-                            </div>
-                            <div class="validation-item" id="check-aspect" style="display: none;">
-                                <i class="fas fa-circle-notch fa-spin check-status"></i>
-                                <span>Hidden item to preserve DOM structure</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                        <form id="contrib-form" onsubmit="return false;">
+                            
+                            <div id="upload-panel">
+                                <div class="form-group">
+                                    <label class="form-label">Lossless Audio File</label>
+                                    <span class="form-desc">Select a .flac file (Max 99 MB).</span>
+                                    
+                                    <div id="drop-zone" class="drag-drop-box">
+                                        <input type="file" id="file-input" accept="audio/flac,.flac" style="display: none;">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <h4 style="color: var(--text-main); margin-bottom: 0.5rem;">Drag & drop audio here, or browse files</h4>
+                                    </div>
 
-                <div id="existing-panel" style="display: none;">
-                    <div class="form-group">
-                        <label class="form-label">Search Existing Track</label>
-                        <div class="existing-search-box">
-                            <i class="fas fa-search existing-search-icon"></i>
-                            <input type="text" id="existing-search" placeholder="Search by song, artist, or URL…" autocomplete="off">
-                        </div>
-                        <span class="field-desc">Search the library to find an audio file you want to reuse.</span>
-                    </div>
-                    <div id="existing-results" class="existing-results-list" style="display: none;"></div>
-                    <div id="existing-selected-banner" class="existing-selected-card" style="display: none;">
-                        <div class="existing-selected-meta">
-                            <i class="fas fa-music existing-selected-icon"></i>
-                            <div>
-                                <strong id="existing-selected-title" class="existing-selected-name">Track Name</strong>
-                                <span id="existing-selected-url" class="existing-selected-url-text"></span>
+                                    <div id="file-info-banner" class="file-info-banner" style="display: none;">
+                                        <div style="display: flex; align-items: center; gap: 1rem;">
+                                            <i class="fas fa-file-audio" style="font-size: 1.5rem; color: var(--accent-color);"></i>
+                                            <div style="display: flex; flex-direction: column;">
+                                                <strong id="selected-file-name" style="font-size: 0.95rem; color: var(--text-main);">audio.flac</strong>
+                                                <span id="selected-file-size" style="font-size: 0.85rem; color: var(--text-secondary);">0.00 MB</span>
+                                            </div>
+                                        </div>
+                                        <button type="button" id="remove-file-btn" class="btn btn-secondary" title="Remove File" style="padding: 0.4rem; border-radius: 50%; width: 32px; height: 32px;">
+                                            <i class="fas fa-times" style="margin: 0;"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" style="background: var(--input-bg); padding: 1rem; border-radius: 8px;">
+                                    <label class="form-label">Technical Requirements</label>
+                                    <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
+                                        <div id="check-format" style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem;">
+                                            <i class="fas fa-circle-notch fa-spin check-status"></i>
+                                            <span>Format must be <strong>.flac</strong></span>
+                                        </div>
+                                        <div id="check-size" style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem;">
+                                            <i class="fas fa-circle-notch fa-spin check-status"></i>
+                                            <span>Size must be ≤ <strong>99 MB</strong></span>
+                                        </div>
+                                        <div id="check-duration" style="display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem;">
+                                            <i class="fas fa-circle-notch fa-spin check-status"></i>
+                                            <span>Valid fLaC signature</span>
+                                        </div>
+                                        <div id="check-aspect" style="display: none;">
+                                            <!-- Hidden to preserve existing JS structure if it checks this -->
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+
+                            <div id="existing-panel" style="display: none;">
+                                <div class="form-group">
+                                    <label class="form-label">Search Existing Track</label>
+                                    <span class="form-desc">Search the library to find an audio file you want to reuse.</span>
+                                    <div class="search-bar" style="margin-top: 0.5rem; max-width: 100%;">
+                                        <i class="fas fa-search"></i>
+                                        <input type="text" id="existing-search" placeholder="Search by song, artist, or URL…" autocomplete="off">
+                                    </div>
+                                </div>
+                                <div id="existing-results" class="list-container" style="display: none; background: var(--input-bg); border-radius: 8px; margin-bottom: 1rem; max-height: 200px; overflow-y: auto;"></div>
+                                
+                                <div id="existing-selected-banner" class="file-info-banner" style="display: none;">
+                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                        <i class="fas fa-music" style="font-size: 1.5rem; color: var(--accent-color);"></i>
+                                        <div style="display: flex; flex-direction: column;">
+                                            <strong id="existing-selected-title" style="font-size: 0.95rem; color: var(--text-main);">Track Name</strong>
+                                            <span id="existing-selected-url" style="font-size: 0.75rem; color: var(--text-secondary); word-break: break-all;"></span>
+                                        </div>
+                                    </div>
+                                    <button type="button" id="clear-existing-btn" class="btn btn-secondary" title="Clear Selection" style="padding: 0.4rem; border-radius: 50%; width: 32px; height: 32px; flex-shrink: 0;">
+                                        <i class="fas fa-times" style="margin: 0;"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="margin-top: 2rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <label class="form-label" style="margin: 0;">Songs to Link</label>
+                                    <span id="song-count-badge" style="font-size: 0.75rem; background: var(--input-bg); padding: 0.2rem 0.6rem; border-radius: 100px;">0 songs</span>
+                                </div>
+                                <span class="form-desc">Add one or more songs that should use this audio file.</span>
+
+                                <div id="song-entries-list" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;"></div>
+
+                                <button type="button" id="add-song-btn" class="btn btn-secondary" style="width: 100%; margin-top: 1rem;">
+                                    <i class="fas fa-plus"></i> Add Song Entry
+                                </button>
+                            </div>
+
+                            <button type="button" id="submit-track-btn" class="btn btn-primary" style="width: 100%; margin-top: 2rem; font-size: 1rem; padding: 1rem;" disabled>
+                                <i class="fas fa-paper-plane"></i> Submit to GitHub
+                            </button>
+                        </form>
+                    </section>
+
+                    <!-- Status Section -->
+                    <section id="status-section" style="display: none; text-align: center; padding: 4rem 1rem;">
+                        <div id="status-loader" class="loader" style="margin: 2rem auto; width: 40px; height: 40px; border-width: 4px;"></div>
+                        <div id="status-success-icon" style="display: none; color: #34c759; font-size: 4rem; margin: 2rem 0;">
+                            <i class="fas fa-check-circle"></i>
                         </div>
-                        <button type="button" id="clear-existing-btn" class="btn-remove-file" title="Clear Selection">
-                            <i class="fas fa-times"></i>
+                        <div id="status-error-icon" style="display: none; color: #ff3b30; font-size: 4rem; margin: 2rem 0;">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        
+                        <h2 id="status-title" style="font-size: 1.5rem; margin-bottom: 0.5rem;">Uploading Track...</h2>
+                        <p id="status-message" style="color: var(--text-secondary); margin-bottom: 2rem;">Please hold tight while we configure your fork and create the pull request.</p>
+                        
+                        <div id="pr-link-container" style="display: none; margin-bottom: 2rem;">
+                            <a id="pr-link" href="#" target="_blank" class="btn btn-primary" style="width: 100%;">
+                                <i class="fab fa-github"></i> View Pull Request on GitHub
+                            </a>
+                        </div>
+
+                        <button id="status-action-btn" class="btn btn-secondary" style="display: none; width: 100%;">
+                            Go Back
                         </button>
-                    </div>
+                    </section>
                 </div>
-
-                <div class="form-group" style="margin-top: 2rem;">
-                    <label class="form-label">
-                        Songs to Link
-                        <span class="song-count-badge" id="song-count-badge">0 songs</span>
-                    </label>
-                    <span class="field-desc">Add one or more songs that should use this audio file. Each entry needs a song title and artist name.</span>
-
-                    <div id="song-entries-list" class="song-entries-list"></div>
-
-                    <button type="button" id="add-song-btn" class="btn-add-song">
-                        <i class="fas fa-plus"></i> Add Song Entry
-                    </button>
-                </div>
-
-                <button type="button" id="submit-track-btn" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 2rem;" disabled>
-                    <i class="fas fa-paper-plane"></i> Submit to GitHub
-                </button>
-            </form>
-        </section>
-
-        <section id="status-section" class="step-card status-card" style="display: none; max-width: 550px; margin: 0 auto; text-align: center;">
-            <div id="status-loader" class="loader" style="margin: 2rem auto;"></div>
-            <div id="status-success-icon" style="display: none; color: var(--accent-secondary); font-size: 4rem; margin: 2rem 0;">
-                <i class="fas fa-check-circle"></i>
             </div>
-            <div id="status-error-icon" style="display: none; color: #dc2626; font-size: 4rem; margin: 2rem 0;">
-                <i class="fas fa-exclamation-circle"></i>
-            </div>
-            
-            <h3 id="status-title">Uploading Track...</h3>
-            <p id="status-message" style="color: var(--text-dim); margin-bottom: 2rem; line-height: 1.7;">Please hold tight while we configure your fork and create the pull request.</p>
-            
-            <div id="pr-link-container" style="display: none; margin-bottom: 2rem;">
-                <a id="pr-link" href="#" target="_blank" class="btn btn-primary btn-github-pr" style="width: 100%; justify-content: center;">
-                    <i class="fab fa-github"></i> View Pull Request on GitHub
-                </a>
-            </div>
+        </main>
 
-            <button id="status-action-btn" class="btn btn-primary" style="display: none; width: 100%; justify-content: center;">
-                Go Back
-            </button>
-        </section>
-    </main>
-
-    <footer>
-        <div class="footer-content">
-            <p>Echo Music Lossless Hub &copy; 2026. Code licensed under GPL-3.0.</p>
-        </div>
-    </footer>
-
-    <script src="contribute.js?v=4"></script>
+        <!-- Mobile Bottom Nav -->
+        <nav class="mobile-nav">
+            <a href="index.html" class="mobile-nav-link">
+                <i class="fas fa-play-circle"></i>
+                <span>Browse</span>
+            </a>
+            <a href="contribute.html" class="mobile-nav-link active">
+                <i class="fas fa-plus-circle"></i>
+                <span>Submit</span>
+            </a>
+            <a href="developer.html" class="mobile-nav-link">
+                <i class="fas fa-code"></i>
+                <span>Dev</span>
+            </a>
+        </nav>
+    </div>
+    
+    <!-- Existing Logic File -->
+    <script src="contribute.js?v=5"></script>
+    <style>
+        /* Add local overrides for dynamic elements created by contribute.js */
+        .song-entry-card {
+            background: var(--input-bg);
+            border-radius: 8px;
+            padding: 1rem;
+            position: relative;
+        }
+        .song-entry-card .form-group {
+            margin-bottom: 1rem;
+        }
+        .song-entry-card .form-group:last-child {
+            margin-bottom: 0;
+        }
+        .song-entry-card input {
+            width: 100%;
+            background: var(--bg-color);
+            border: 1px solid var(--sidebar-border);
+            padding: 0.6rem 0.8rem;
+            border-radius: 6px;
+            color: var(--text-main);
+            font-family: var(--font-stack);
+        }
+        .song-entry-card input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        .btn-remove-song {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: var(--bg-color);
+            color: var(--text-secondary);
+            border: 1px solid var(--sidebar-border);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-remove-song:hover {
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+        
+        .check-status.fa-check-circle {
+            color: #34c759;
+        }
+        .check-status.fa-times-circle {
+            color: #ff3b30;
+        }
+        .check-status.fa-circle-notch {
+            color: var(--accent-color);
+        }
+    </style>
+    <script>
+        // Sidebar Toggle Logic
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        if (sidebar && toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+            });
+        }
+    </script>
 </body>
-
 </html>

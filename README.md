@@ -101,7 +101,7 @@ Need help or want to join the Echo Music community?
 
 * **Discord Community:** [Join our Discord](https://discord.com/invite/EcfV3AxH5c)
 * **Telegram Channel:** [Join our Telegram](https://t.me/EchoMusicApp)
-* **Issues:** If you encounter any bugs, please [open a GitHub Issue](https://github.com/EchoMusicApp/Lossless/issues).
+* **Issues:** If you encounter any bugs, please [open a GitHub Issue](https://github.com/EchoMusicApp/Lossless).
 
 ---
 

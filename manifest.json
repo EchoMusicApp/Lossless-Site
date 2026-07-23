@@ -1,0 +1,17 @@
+{
+  "name": "Echo Music Lossless Hub",
+  "short_name": "Echo Music",
+  "description": "Discover, search, and listen to lossless FLAC audio tracks.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#141218",
+  "theme_color": "#6750A4",
+  "icons": [
+    {
+      "src": "App Logo/echo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

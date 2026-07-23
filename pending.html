@@ -1,84 +1,269 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#121212">
-    <title>Pending Contributions — Echo Music Lossless</title>
-    <meta name="description" content="View all pending lossless contributions waiting to be merged into the Echo Music Lossless database.">
-
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://lossless.echomusic.fun/pending.html">
-    <meta property="og:title" content="Pending Contributions — Echo Music Lossless">
-    <meta property="og:description" content="See what lossless contributions are waiting to be reviewed and merged.">
-    <meta property="og:image" content="https://lossless.echomusic.fun/App%20Logo/echo.png">
-
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+    <title>Pending PRs - Echo Music Lossless Hub</title>
     <link rel="icon" type="image/png" href="App Logo/echo.png">
-    <link rel="stylesheet" href="styles.css?v=4">
+    <link rel="stylesheet" href="styles.css?v=5">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .pending-card {
+            background: var(--input-bg);
+            border-radius: var(--shape-large);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            min-width: 0;
+        }
+        
+        .pending-audio-col {
+            flex-shrink: 0;
+            width: 80px;
+            height: 80px;
+            background: var(--sidebar-border);
+            border-radius: var(--shape-medium);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pending-audio-col .play-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-color);
+            font-size: 16px;
+            opacity: 1; /* Always visible for pending tracks */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+
+        .pending-info-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0; /* truncate child text */
+        }
+
+        .pending-pr-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .pending-pr-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: var(--bg-color);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .pending-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .pending-pr-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pending-author {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .pending-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .pending-songs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .pending-song-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .pending-song-item i {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+
+        .pending-song-name {
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .pending-artist-name {
+            color: var(--text-secondary);
+        }
+
+        .pending-more {
+            font-size: 0.75rem;
+            color: var(--accent-color);
+            margin-top: 0.25rem;
+            font-weight: 500;
+        }
+
+        @media (max-width: 600px) {
+            .pending-card {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            .pending-info-col {
+                min-width: 0; /* ensure it truncates */
+                flex: 1 1 50%; /* allow it to take available space in row */
+            }
+            .pending-view-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
-
 <body>
-    <nav class="top-bar">
-        <div class="top-bar-content">
-            <a href="index.html" class="brand">
-                <img src="App Logo/echo.png" alt="Echo Music Logo" class="app-icon">
-                <span class="copyright">ECHO MUSIC</span>
-            </a>
-            <button class="nav-hamburger" id="nav-hamburger" aria-label="Toggle menu" aria-expanded="false">
-                <span></span><span></span><span></span>
-            </button>
-            <div class="nav-links" id="nav-links">
-                <a href="developer.html" class="nav-support-btn"><i class="fas fa-code" style="margin-right: 0.3rem;"></i>Developer</a>
-                <a href="pending.html" class="nav-support-btn nav-active-btn"><i class="fas fa-code-pull-request" style="margin-right: 0.3rem;"></i>Pending PRs</a>
-                <a href="https://support.iad1tya.cyou" target="_blank" rel="noopener" class="nav-support-btn"><i class="fas fa-hand-holding-heart" style="margin-right: 0.3rem;"></i>Support</a>
-            </div>
-        </div>
-    </nav>
-
-    <main class="container">
-        <header style="margin-bottom: 3rem;">
-            <h1 id="main-title">Pending Contributions</h1>
-            <p>These lossless track submissions are waiting to be reviewed and merged. Once approved, they'll appear in the main track directory.</p>
-        </header>
-
-        <section class="status-bar" style="margin-top: 0;">
-            <h2>Open Pull Requests</h2>
-            <span id="pr-count">Loading...</span>
-        </section>
-
-        <section id="pending-grid" class="pending-list">
-            <div class="loader" id="loading-spinner"></div>
-        </section>
-
-        <div id="empty-state" style="display: none;">
-            <div class="empty-state" style="padding: 4rem 2rem; text-align: center;">
-                <i class="fas fa-check-double" style="font-size: 2.5rem; color: #059669; margin-bottom: 1rem;"></i>
-                <p style="font-size: 1.1rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem;">All caught up!</p>
-                <p style="color: var(--text-dim);">There are no pending lossless contributions at the moment. Be the first to <a href="contribute.html" style="color: var(--accent-monochrome); font-weight: 600;">submit one</a>!</p>
-            </div>
-        </div>
-
-        <div id="error-state" style="display: none;">
-            <div class="error-state" style="padding: 2.5rem; text-align: center;">
-                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                <p id="error-message">Failed to load pending contributions.</p>
-                <button onclick="loadPendingPRs()" class="btn btn-primary" style="margin-top: 1rem; font-size: 0.85rem;">
-                    <i class="fas fa-redo"></i> Retry
+    <div class="app-container">
+        <!-- Desktop Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="sidebar-logo-container">
+                    <img src="App Logo/echo.png" alt="Logo" class="sidebar-logo">
+                    <span class="sidebar-title">Echo Music</span>
+                </a>
+                <button class="sidebar-toggle-btn" id="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
                 </button>
             </div>
-        </div>
-    </main>
-
-    <footer>
-        <div id="support-section" class="footer-content">
-            <div class="footer-credits">
-                <p style="margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.6;">Licensed under <a href="LICENSE" target="_blank">GPL-3.0</a>.</p>
+            
+            <div class="sidebar-nav-group">
+                <div class="sidebar-nav-title">Apple Music</div>
+                <a href="index.html" class="sidebar-nav-link"><i class="fas fa-play-circle"></i> Browse</a>
+                <a href="contribute.html" class="sidebar-nav-link"><i class="fas fa-plus-circle"></i> Submit Track</a>
+                <a href="pending.html" class="sidebar-nav-link active"><i class="fas fa-code-pull-request"></i> Pending PRs</a>
             </div>
-        </div>
-    </footer>
+
+            <div class="sidebar-nav-group">
+                <div class="sidebar-nav-title">Resources</div>
+                <a href="developer.html" class="sidebar-nav-link"><i class="fas fa-code"></i> Developer</a>
+                <a href="https://support.iad1tya.cyou" target="_blank" rel="noopener" class="sidebar-nav-link"><i class="fas fa-hand-holding-heart"></i> Support</a>
+                <a href="https://github.com/EchoMusicApp/Lossless" target="_blank" rel="noopener" class="sidebar-nav-link"><i class="fab fa-github"></i> GitHub</a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Mobile Header -->
+            <div class="mobile-header">
+                <div class="mobile-logo-row">
+                    <div class="mobile-logo">
+                        <img src="App Logo/echo.png" alt="Logo">
+                        Pending PRs
+                    </div>
+                </div>
+            </div>
+
+            <div class="top-nav" style="justify-content: flex-end;"></div>
+
+            <div class="content-area">
+                <h1 class="page-title">Pending PRs</h1>
+                <p class="page-subtitle">Track submissions waiting to be reviewed and merged.</p>
+
+                <div class="section-title">
+                    <span>Open Pull Requests</span>
+                    <span class="count" id="pr-count">Loading...</span>
+                </div>
+
+                <div id="pending-grid" class="list-container">
+                    <div class="loader" id="loading-spinner"></div>
+                </div>
+
+                <div id="empty-state" style="display: none;">
+                    <div class="empty-state">
+                        <i class="fas fa-check-double" style="font-size: 2.5rem; color: #34c759; margin-bottom: 1rem;"></i>
+                        <p style="font-size: 1.1rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.5rem;">All caught up!</p>
+                        <p>There are no pending contributions at the moment.</p>
+                    </div>
+                </div>
+
+                <div id="error-state" style="display: none;">
+                    <div class="empty-state" style="color: #ff3b30;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p id="error-message">Failed to load pending contributions.</p>
+                        <button onclick="loadPendingPRs()" class="btn btn-secondary" style="margin-top: 1rem;">
+                            <i class="fas fa-redo"></i> Retry
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <footer class="app-footer">
+                    <div class="footer-links">
+                        <a href="privacy.html">Privacy</a>
+                        <a href="terms.html">Terms</a>
+                    </div>
+                    <p class="footer-tagline">From the Echo Music community to the world, always completely free.</p>
+                </footer>
+
+            </div>
+        </main>
+
+        <!-- Mobile Bottom Nav -->
+        <nav class="mobile-nav">
+            <a href="index.html" class="mobile-nav-link">
+                <i class="fas fa-play-circle"></i>
+                <span>Browse</span>
+            </a>
+            <a href="contribute.html" class="mobile-nav-link">
+                <i class="fas fa-plus-circle"></i>
+                <span>Submit</span>
+            </a>
+            <a href="developer.html" class="mobile-nav-link">
+                <i class="fas fa-code"></i>
+                <span>Dev</span>
+            </a>
+        </nav>
+    </div>
 
     <script>
         const GITHUB_API_URL = 'https://api.github.com';
@@ -132,8 +317,7 @@
                 console.error('Error loading PRs:', error);
                 grid.innerHTML = '';
                 errorState.style.display = 'block';
-                document.getElementById('error-message').textContent =
-                    `Failed to load pending contributions: ${error.message}`;
+                document.getElementById('error-message').textContent = `Failed to load PRs: ${error.message}`;
                 prCountEl.textContent = 'Error';
             }
         }
@@ -142,26 +326,19 @@
             const songs = [];
             const body = pr.body || '';
 
-            // Try to parse table rows from the PR body: | Song Title | Artist |
             const tableRowRegex = /\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|/g;
             let match;
-            let isHeader = true;
 
             while ((match = tableRowRegex.exec(body)) !== null) {
                 const col1 = match[1].trim();
                 const col2 = match[2].trim();
 
-                // Skip table header and separator rows
-                if (col1 === 'Song Title' || col1.startsWith('---') || col1 === '---') {
-                    continue;
-                }
-
+                if (col1 === 'Song Title' || col1.startsWith('---') || col1 === '---') continue;
                 if (col1 && col2 && !col1.startsWith('---') && !col2.startsWith('---')) {
                     songs.push({ song: col1, artist: col2 });
                 }
             }
 
-            // Fallback: parse from PR title
             if (songs.length === 0) {
                 const titleMatch = pr.title.match(/(?:add|feat:)\s*(?:lossless\s*(?:track\s*)?(?:for)?\s*)?(.+?)(?:\s*[—–-]\s*(.+))?$/i);
                 if (titleMatch) {
@@ -176,7 +353,6 @@
                     });
                 }
             }
-
             return songs;
         }
 
@@ -189,17 +365,13 @@
                 if (!filesRes.ok) return parseLiveAudioFromPR(pr);
 
                 const files = await filesRes.json();
-
-                const audioFile = files.find(f =>
-                    f.filename.toLowerCase().endsWith('.flac')
-                );
+                const audioFile = files.find(f => f.filename.toLowerCase().endsWith('.flac'));
 
                 if (audioFile) {
                     const forkOwner = pr.head.user.login;
                     const branchName = pr.head.ref;
                     return `https://raw.githubusercontent.com/${forkOwner}/${TARGET_REPO}/${branchName}/${audioFile.filename}`;
                 }
-
                 return parseLiveAudioFromPR(pr);
             } catch (e) {
                 return parseLiveAudioFromPR(pr);
@@ -215,73 +387,56 @@
             return null;
         }
 
-
-
         function createPRCard(pr, songs, audioUrl) {
             const card = document.createElement('div');
             card.className = 'pending-card';
 
             const timeAgo = getTimeAgo(new Date(pr.created_at));
 
-            // Build songs list HTML
-            const songsHtml = songs.slice(0, 5).map(s => `
+            const songsHtml = songs.slice(0, 3).map(s => `
                 <div class="pending-song-item">
                     <i class="fas fa-music"></i>
-                    <div class="pending-song-info">
+                    <div>
                         <span class="pending-song-name">${escapeHtml(s.song)}</span>
-                        <span class="pending-artist-name">${escapeHtml(s.artist)}</span>
+                        <span class="pending-artist-name"> — ${escapeHtml(s.artist)}</span>
                     </div>
                 </div>
             `).join('');
 
-            const remainingCount = songs.length > 5 ? `<span class="pending-more">+${songs.length - 5} more songs</span>` : '';
-
+            const remainingCount = songs.length > 3 ? `<div class="pending-more">+${songs.length - 3} more songs</div>` : '';
             const audioId = 'pending_aud_' + Math.random().toString(36).substr(2, 9);
 
             card.innerHTML = `
-                <div class="pending-card-layout">
-                    <div class="pending-audio-col">
-                        ${audioUrl ? `
-                            <div class="pending-audio-wrapper" style="display: flex; align-items: center; justify-content: center; background: #111; position: relative; overflow: hidden;">
-                                <audio id="${audioId}" src="${audioUrl}" style="display: none;"></audio>
-                                <button class="custom-play-btn" onclick="togglePlay(event, '${audioId}', this)" style="position: relative; z-index: 2;">
-                                    <i class="fas fa-play" style="margin-left: 4px;"></i>
-                                </button>
-                            </div>
-                        ` : `
-                            <div class="pending-audio-wrapper pending-no-audio">
-                                <i class="fas fa-music"></i>
-                                <span>No audio preview</span>
-                            </div>
-                        `}
-                    </div>
-                    <div class="pending-info-col">
-                        <div class="pending-header">
-                            <div class="pending-pr-meta">
-                                <span class="pending-pr-badge">
-                                    <i class="fas fa-code-pull-request"></i> PR #${pr.number}
-                                </span>
-                                <span class="pending-time">${timeAgo}</span>
-                            </div>
-                            <h3 class="pending-pr-title">${escapeHtml(pr.title)}</h3>
-                            <div class="pending-author">
-                                <img src="${pr.user.avatar_url}" alt="${pr.user.login}" class="pending-avatar">
-                                <span>by <strong>${escapeHtml(pr.user.login)}</strong></span>
-                            </div>
+                <div class="pending-audio-col">
+                    ${audioUrl ? `
+                        <i class="fas fa-compact-disc"></i>
+                        <div class="play-overlay" onclick="togglePlay(event, '${audioId}', this)">
+                            <i class="fas fa-play" style="margin-left: 2px;"></i>
                         </div>
-                        <div class="pending-songs-list">
-                            ${songsHtml}
-                            ${remainingCount}
-                        </div>
-                    </div>
-                    <a href="${pr.html_url}" target="_blank" rel="noopener" class="btn btn-secondary pending-view-btn btn-icon-text" style="flex-shrink: 0; padding: 0.5rem 1rem; border-radius: 8px; margin-left: auto;">
-                        <i class="fab fa-github"></i> <span>View PR</span>
-                    </a>
+                        <audio id="${audioId}" src="${audioUrl}"></audio>
+                    ` : `
+                        <i class="fas fa-music"></i>
+                    `}
                 </div>
+                <div class="pending-info-col">
+                    <div class="pending-pr-meta">
+                        <span class="pending-pr-badge"><i class="fas fa-code-pull-request"></i> #${pr.number}</span>
+                        <span class="pending-time">${timeAgo}</span>
+                    </div>
+                    <div class="pending-pr-title" title="${escapeHtml(pr.title)}">${escapeHtml(pr.title)}</div>
+                    <div class="pending-author">
+                        <img src="${pr.user.avatar_url}" alt="${pr.user.login}" class="pending-avatar">
+                        <span>by <strong>${escapeHtml(pr.user.login)}</strong></span>
+                    </div>
+                    <div class="pending-songs-list">
+                        ${songsHtml}
+                        ${remainingCount}
+                    </div>
+                </div>
+                <a href="${pr.html_url}" target="_blank" rel="noopener" class="btn btn-secondary pending-view-btn">
+                    <i class="fab fa-github"></i> View PR
+                </a>
             `;
-
-
-
             return card;
         }
 
@@ -313,28 +468,6 @@
                 .replace(/"/g, '&quot;');
         }
 
-        document.addEventListener('DOMContentLoaded', loadPendingPRs);
-    </script>
-    <script>
-        (function() {
-            const btn = document.getElementById('nav-hamburger');
-            const menu = document.getElementById('nav-links');
-            if (!btn || !menu) return;
-            btn.addEventListener('click', () => {
-                const open = menu.classList.toggle('nav-open');
-                btn.classList.toggle('nav-hamburger--open', open);
-                btn.setAttribute('aria-expanded', open);
-            });
-            menu.querySelectorAll('a').forEach(a => {
-                a.addEventListener('click', () => {
-                    menu.classList.remove('nav-open');
-                    btn.classList.remove('nav-hamburger--open');
-                    btn.setAttribute('aria-expanded', 'false');
-                });
-            });
-        })();
-    </script>
-    <script>
         async function togglePlay(event, audioId, btn) {
             event.preventDefault();
             event.stopPropagation();
@@ -345,9 +478,9 @@
                 document.querySelectorAll('audio').forEach(a => {
                     if (a.id !== audioId && !a.paused) a.pause();
                 });
-                document.querySelectorAll('.custom-play-btn i').forEach(i => {
+                document.querySelectorAll('.play-overlay i').forEach(i => {
                     i.className = 'fas fa-play';
-                    i.style.marginLeft = '4px';
+                    i.style.marginLeft = '2px';
                 });
                 
                 icon.className = 'fas fa-circle-notch fa-spin';
@@ -360,20 +493,31 @@
                 } catch (e) {
                     console.error("Playback failed", e);
                     icon.className = 'fas fa-play';
-                    icon.style.marginLeft = '4px';
+                    icon.style.marginLeft = '2px';
                 }
             } else {
                 audio.pause();
                 icon.className = 'fas fa-play';
-                icon.style.marginLeft = '4px';
+                icon.style.marginLeft = '2px';
             }
             
             audio.onended = () => {
                 icon.className = 'fas fa-play';
-                icon.style.marginLeft = '4px';
+                icon.style.marginLeft = '2px';
             };
+        }
+
+        document.addEventListener('DOMContentLoaded', loadPendingPRs);
+    </script>
+    <script>
+        // Sidebar Toggle Logic
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        if (sidebar && toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+            });
         }
     </script>
 </body>
-
 </html>
